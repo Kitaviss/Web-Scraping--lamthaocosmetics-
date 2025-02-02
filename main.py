@@ -31,11 +31,11 @@ def chrome_driver():
     chrome_options.add_argument(f'user-agent={random.choice(USER_AGENTS)}')
     return webdriver.Chrome(options=chrome_options)
 
-def scrappe_category_data():
+def scrape_category_data():
     url = 'https://lamthaocosmetics.vn/collections/'
     driver = chrome_driver()
     driver.get(url)
-    print('Start scrapping category data')
+    print('Start scraping category data')
     try:
         element = WebDriverWait(driver, 50).until(
             EC.presence_of_element_located(
@@ -57,12 +57,12 @@ def scrappe_category_data():
 
     return category_links
 
-def scrappe_product_pagination_data(urls):
+def scrape_product_pagination_data(urls):
     product_listing = []
     for url in urls:
         driver = chrome_driver()
         driver.get(url)
-        print('Start scrapping product pagination data of ', url)
+        print('Start scraping product pagination data of ', url)
         item_per_page = Select(driver.find_element(By.ID, 'hienthitheo'))
         item_per_page.select_by_value(HIENTHITHEO)
         time.sleep(SLEEP_TIME_FOR_HIENTHITHEO)
@@ -95,12 +95,12 @@ def scrappe_product_pagination_data(urls):
 
     return product_listing
 
-def scrappe_product_listing_data(urls):
+def scrape_product_listing_data(urls):
     product_links = []
     for url in urls:
         driver = chrome_driver()
         driver.get(url)
-        print('Start scrapping product listing data of ', url)
+        print('Start scraping product listing data of ', url)
         item_per_page = Select(driver.find_element(By.ID, 'hienthitheo'))
         item_per_page.select_by_value(HIENTHITHEO)
         time.sleep(SLEEP_TIME_FOR_HIENTHITHEO)
@@ -126,12 +126,12 @@ def scrappe_product_listing_data(urls):
 
     return product_links
 
-def scrappe_product_detail_data(urls):
+def scrape_product_detail_data(urls):
     k = 1
     for url in urls:
         driver = chrome_driver()
         driver.get(url)
-        print('Start scrapping product detail data of ',url)
+        print('Start scraping product detail data of ',url)
         try:
             element = WebDriverWait(driver, 50).until(
                 EC.presence_of_element_located(
@@ -177,9 +177,9 @@ def scrappe_product_detail_data(urls):
             driver.quit()
 
 def extract_product_info(content):
-    file_exists = os.path.isfile('scrappe_data_lamthaocosmetics.csv')
+    file_exists = os.path.isfile('scrape_data_lamthaocosmetics.csv')
     
-    with open('scrappe_data_lamthaocosmetics.csv', 'a' if file_exists else 'w', encoding="utf-8", newline='') as csvfile:
+    with open('scrape_data_lamthaocosmetics.csv', 'a' if file_exists else 'w', encoding="utf-8", newline='') as csvfile:
         fieldnames = ['no', 'url', 'product_id', 'name', 'brand', 'category', 'sold', 'featured_image', 'description', 'published_at', 'created_at', 'variant_by', 'variant_id', 'title', 'barcode', 'price', 'variant_image', 'available', 'inventory_quantity']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         
@@ -189,7 +189,7 @@ def extract_product_info(content):
         writer.writerows(content)
     
 def main():
-    scrappe_product_detail_data(scrappe_product_listing_data(scrappe_product_pagination_data(scrappe_category_data())))
+    scrape_product_detail_data(scrape_product_listing_data(scrape_product_pagination_data(scrape_category_data())))
 
 if __name__ == '__main__':
     main()
